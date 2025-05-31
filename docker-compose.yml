@@ -1,0 +1,23 @@
+
+services:
+  postgres:
+    image: postgres:17.4
+    ports:
+      - "5433:5432"  # Fix: added space and quotes
+    environment:
+      POSTGRES_USER: adminHu101
+      POSTGRES_PASSWORD: pass101
+      POSTGRES_DB: notes
+    volumes:
+      - notesData:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"  # Fix: added space and quotes
+    volumes:
+      - notesRedis:/data
+
+volumes:
+  notesRedis:
+  notesData:
