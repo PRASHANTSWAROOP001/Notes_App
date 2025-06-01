@@ -7,6 +7,9 @@ import {handleZod_PrismaError, handlePrismaError} from "../utils/erroHandler";
 import {hashPassword, verifyPassword} from "../utils/jwtUtils";
 import jwt from "jsonwebtoken"
 
+
+const prisma = new PrismaClient();
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -16,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 
 const NODE_ENV = process.env.NODE_ENV!;
 
-const prisma = new PrismaClient();
+
 
 const userSchema = z.object({
     name:z.string().min(3,"name must be greater than three letters"),
