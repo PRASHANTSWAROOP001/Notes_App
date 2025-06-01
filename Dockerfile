@@ -18,8 +18,8 @@ RUN npx prisma generate
 # Now build the TypeScript code
 RUN npm run build
 
-# Optionally remove .env if you're concerned about secrets
-# RUN rm .env
+
+RUN rm .env
 
 # Expose the app port
 EXPOSE 5000
