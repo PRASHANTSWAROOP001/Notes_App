@@ -1,28 +1,47 @@
-FROM node:24.1-slim
+# ------------ Build Stage ------------
+FROM node:24-alpine AS build
+
+# Install tools required for Prisma engine builds
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Install dependencies first
-COPY package*.json ./
-RUN npm install
+# Copy and install dependencies
+COPY package*.json tsconfig.json ./
+RUN npm ci
 
-# Copy all other files including prisma/
-COPY . .
+# Copy code and Prisma schema
+COPY prisma ./prisma
+COPY src ./src
 
-# Copy .env temporarily (optional but recommended for Prisma generate)
-COPY .env .env
-
-# Generate Prisma client **before** building TypeScript
+# Generate the Prisma client for type support (TS build)
+ENV NODE_ENV=development
 RUN npx prisma generate
 
-# Now build the TypeScript code
+# Build TypeScript
 RUN npm run build
 
+# ------------ Production Stage ------------
+FROM node:24-alpine AS runner
 
-RUN rm .env
+WORKDIR /app
 
-# Expose the app port
+# Copy only runtime essentials
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+
+# Re-run generate for runtime
+ENV NODE_ENV=production
+ENV DATABASE_URL="postgresql://adminHu101:pass101@postgres:5432/notes"
+RUN npx prisma generate
+
+# Create logs dir if needed
+RUN mkdir logs
+
 EXPOSE 5000
 
-# Start the app
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/server.js"]
