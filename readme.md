@@ -27,7 +27,7 @@ This app features JWT authentication (access & refresh tokens), robust API endpo
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/notes-app.git
+git clone https://github.com/PRASHANTSWAROOP001/notes-app.git
 cd notes-app
 ```
 
